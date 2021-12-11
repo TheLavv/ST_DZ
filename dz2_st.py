@@ -86,8 +86,9 @@ def get_all_errors(mult):
 
 
 # Утилита для получения вектора ошибки по синдрому
-def get_error_vector(syndrome, all_errors):
+def get_error_vector(syndrome):
     error_vector = 0
+    all_errors = get_all_errors(1)
     for vector in all_errors:
         vector_num = arr_to_num(vector)
         if (get_syndrome(vector_num) == syndrome):
@@ -99,8 +100,10 @@ def is_error_corrected(error_vector, all_errors):
     encoded_info = coding()
     error_info = encoded_info ^ error_vector
     syndrome = get_syndrome(error_info)
-    supposed_error_vector = get_error_vector(syndrome, all_errors)
-    if (encoded_info == error_info ^ supposed_error_vector):
+    supposed_error_vector = get_error_vector(syndrome)
+    corrected_info = error_info ^ supposed_error_vector
+    initial_info = corrected_info >> n - k
+    if (initial_info == information):
         return 2
     elif syndrome != 0:
         return 1
@@ -129,6 +132,8 @@ def Ck_calc():
                 No += 1
             elif flag == 1:
                 No += 1
+            else:
+                print("error not found")
         Nk_vector[i - 1] = Nk
         No_vector[i - 1] = No
         Ck_vector[i - 1] = Nk / Cn_vector[i - 1] * 100
@@ -151,7 +156,7 @@ def main():
     print(f"encoded information with test error vector (0100): {bin(info_error)}")
     syndrome_test = get_syndrome(info_error)
     print(f"syndrome: {bin(syndrome_test)}")
-    error_vector = get_error_vector(syndrome_test, get_all_errors(1))
+    error_vector = get_error_vector(syndrome_test)
     print(f"computed error vector: {bin(error_vector)}")
     info_corrected = info_error ^ error_vector
     print(f"corrected information: {bin(info_corrected)}")
